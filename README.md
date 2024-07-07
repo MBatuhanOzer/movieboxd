@@ -1,2 +1,2 @@
 # movieboxd
-A letterboxd clone that uses Movie DBAPI.
+A letterboxd clone that uses MovieDB API.
