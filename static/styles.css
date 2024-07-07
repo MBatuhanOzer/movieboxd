@@ -1,0 +1,136 @@
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #141414; /* Dark background */
+    color: #ffffff; /* Light text */
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px; /* Limit width for content */
+    margin: 0 auto; /* Center container */
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo a {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #4CAF50; /* Green color for Mainboxd */
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+}
+
+.nav-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.nav-links li {
+    margin-right: 15px; /* Space between nav items */
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #aaaaaa; /* Lighter color for nav links */
+    font-size: 16px;
+}
+
+.nav-links li a:hover {
+    color: #ffffff; /* White color on hover */
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-top: 20px; /* Space above search bar */
+}
+
+#search-bar {
+    width: 300px; /* Adjust width as needed */
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px 0 0 5px; /* Rounded left corner */
+    background-color: #333;
+    color: #fff;
+}
+
+#search-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 0 5px 5px 0; /* Rounded right corner */
+    background-color: #4CAF50; /* Green color */
+    color: #fff;
+    cursor: pointer;
+}
+
+#search-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+main {
+    text-align: center;
+}
+
+#results {
+    margin-top: 20px;
+}
+
+.movie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space evenly between items */
+    padding: 10px;
+    border-bottom: 1px solid #333;
+    cursor: pointer;
+}
+
+.movie:hover {
+    background-color: #333;
+}
+
+.movie img {
+    width: 50px;
+    height: 75px;
+    border-radius: 5px;
+    margin-left: 10px; /* Space between image and text */
+}
+
+.movie-details {
+    flex: 1; /* Take remaining space */
+    display: flex;
+    justify-content: space-between; /* Space evenly between text */
+    align-items: center;
+}
+
+.movie-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+    color: #fff;
+}
+
+.movie-year {
+    font-size: 14px;
+    color: #aaaaaa;
+    margin: 0;
+}
