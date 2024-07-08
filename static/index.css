@@ -1,0 +1,128 @@
+/* Reset default margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #141414; /* Dark background */
+    color: #ffffff; /* Light text */
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 1200px; /* Limit width for content */
+    margin: 0 auto; /* Center container */
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative; /* Needed for absolute positioning of results */
+}
+
+.logo a {
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #4CAF50; /* Green color for Mainboxd */
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    margin-left: 20px; /* Space between logo and nav */
+}
+
+.nav-links {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+
+.nav-links li {
+    margin-right: 15px; /* Space between nav items */
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: #aaaaaa; /* Lighter color for nav links */
+    font-size: 16px;
+}
+
+.nav-links li a:hover {
+    color: #ffffff; /* White color on hover */
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Align search bar to the right */
+    position: relative; /* Needed for absolute positioning of results */
+}
+
+#search-bar {
+    width: 500px; /* Adjust width as needed */
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px 0 0 5px; /* Rounded left corner */
+    background-color: #333;
+    color: #fff;
+}
+
+#results {
+    position: absolute;
+    top: 50px; /* Adjust to be below the search bar */
+    left: 0;
+    width: 100%;
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 0 0 5px 5px; /* Rounded bottom corners */
+    max-height: 300px; /* Limit height and allow scroll */
+    overflow-y: auto;
+    z-index: 1000; /* Ensure it's above other elements */
+}
+
+.movie {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between items */
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #1e1e1e; /* Dark background for movie item */
+    border-radius: 8px;
+    border: 1px solid #333;
+    text-decoration: none;
+}
+
+.movie img {
+    width: 50px;
+    height: 75px;
+    border-radius: 5px;
+}
+
+.movie-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+    text-decoration: none;
+    flex: 1; /* Take up remaining space */
+}
+
+.movie-year {
+    font-size: 14px;
+    color: #aaaaaa;
+    text-align: right;
+    text-decoration: none;
+    margin-left: auto; /* Align to the right */
+}
+
+a {
+    text-decoration: none;
+}

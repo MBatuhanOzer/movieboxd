@@ -24,22 +24,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (results.length > 0) {
             resultsContainer.style.display = 'block';
             results.slice(0, 10).forEach(movie => {
-                const movieElement = document.createElement('div');
-                movieElement.classList.add('movie');
+                const linkElement = document.createElement('a');
+                linkElement.href = `/movie?id=${movie.id}`;
 
                 const moviePoster = movie.poster_path ? `https://image.tmdb.org/t/p/w200${movie.poster_path}` : 'https://via.placeholder.com/50x75';
                 const movieTitle = movie.title || 'Untitled';
                 const movieYear = movie.release_date ? movie.release_date.split('-')[0] : 'Unknown';
 
-                movieElement.innerHTML = `
+                linkElement.innerHTML = `
+                    <div class="movie">
                     <img src="${moviePoster}" alt="${movieTitle}">
-                    <div class="movie-details">
                         <p class="movie-title">${movieTitle}</p>
                         <p class="movie-year">${movieYear}</p>
                     </div>
                 `;
 
-                resultsContainer.appendChild(movieElement);
+                resultsContainer.appendChild(linkElement);
             });
         } else {
             resultsContainer.style.display = 'none';

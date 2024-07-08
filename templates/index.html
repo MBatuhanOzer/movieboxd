@@ -2,32 +2,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie Search</title>
-    <link rel="stylesheet" href="../static/styles.css">
+    <link rel="stylesheet" href="../static/index.css">
 </head>
 <body>
     <div class="container">
         <header>
             <div class="logo">
-                <a href="#">Mainboxd</a>
-            </div>
-            <div class="search-bar">
-                <input type="text" id="search-bar" placeholder="Search for a movie...">
-                <button id="search-button">Search</button>
+                <a href="/">Mainboxd</a>
             </div>
             <nav class="navbar">
                 <ul class="nav-links">
-                    <li><a href="#">Films</a></li>
-                    <li><a href="#">Watchlist</a></li>
-                    <li><a href="#">Watched</a></li>
-                    <li><a href="#">Logout</a></li>
+                    <li><a href="/films">Films</a></li>
+                    <li><a href="/watchlist">Watchlist</a></li>
+                    <li><a href="/watched">Watched</a></li>
+                    <li><a href="/logout">Logout</a></li>
                 </ul>
             </nav>
-        </header>
-        <main>
-            <div id="results">
-                <!-- Results will be dynamically populated here -->
+            <div class="search-bar">
+                <input type="text" id="search-bar" placeholder="Search for a movie...">
+                <div id="results"></div>
             </div>
-        </main>
+        </header>
     </div>
     <script src="../static/scripts.js"></script>
 
