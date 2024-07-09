@@ -10,9 +10,9 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-def api():
-    with open("api.txt", "r") as file:
-        return file.readline()
+
+with open("api.txt", "r") as file:
+    API = file.readline()
 
 def login_required(f):
     @wraps(f)
@@ -104,18 +104,44 @@ def logout():
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    return render_template("index.html")
+    global API
+    response = requests.get(f'https://api.themoviedb.org/3/movie/popular', params={
+        'api_key': API,
+        'language': 'en-US',
+        'page': 1
+    })
+    if response.status_code == 200:
+        return render_template("index.html", movies=response.json().get("results", []))
+    return []
+
 
 @app.route('/search', methods=['GET'])
+@login_required
 def search():
+    global API
     query = request.args.get('q')
-    MOVIE_DB_API_KEY = api()
     if query:
         response = requests.get(f'https://api.themoviedb.org/3/search/movie', params={
-            'api_key': MOVIE_DB_API_KEY,
+            'api_key': API,
             'query': query
         })
         data = response.json()
         return jsonify(data)
     return jsonify({'results': []})
 
+
+@app.route("/movie/<int:movieid>")
+@login_required
+def movie(movieid):
+    return render_template("movie.html")
+
+@app.route("/api", methods=["GET"])
+@login_required
+def api():
+    global API
+    query = request.args.get('q')
+    response = requests.get(f'https://api.themoviedb.org/3/movie/{query}',params={
+        'append_to_response': 'videos',
+        'api_key': API
+    })
+    return jsonify(response.json())

@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}{% endblock %}
+{% block main %}
+        <div id="movie-container" class="movie-container">
+            <div class="top-right-icons">
+                <button id="watchlist-button" title="Add to Watchlist">★</button>
+                <button id="watched-button" title="Mark Watched">✓</button>
+            </div>
+            <div class="movie-poster">
+                <img id="movie-poster" src="" alt="Movie Poster">
+            </div>
+            <div class="movie-details">
+                <h1 id="movie-title"></h1>
+                <p id="movie-info"></p>
+                <div class="rating">
+                    <div id="movie-score" class="score"></div>
+                    <p>TMDB Rating</p>
+                </div>  
+                <div class="synopsis">
+                    <div id="movie-tagline" class="movie-tagline"></div>
+                    <h2>Overview</h2>
+                    <p id="movie-synopsis"></p>
+                </div>
+                <div class="credits" id="credits-container"></div>
+            </div>
+        </div>
+{% endblock %}
