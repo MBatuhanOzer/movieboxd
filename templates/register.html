@@ -43,16 +43,19 @@
                         <h3 class="card-title text-center">Register</h3>
                         <form method="POST" action="/register">
                             <div class="form-group">
-                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Set Username" type="text">
+                                <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="username" placeholder="Set Username" type="text" required>
                             </div>
                             <div class="form-group">
-                                <input class="form-control mx-auto w-auto" name="password" placeholder="Set Password" type="password">
+                                <input class="form-control mx-auto w-auto" name="password" placeholder="Set Password" type="password" required>
                             </div>
                             <div class="form-group">
-                                <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Set Password" type="password">
+                                <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Set Password" type="password" required>
                             </div>
                             <button type="submit" class="btn btn-primary btn-block">Register</button>
                         </form>
+                        <div class="text-center mt-3">
+                            <p>Do you have an account? <a href="/login">Login</a></p>
+                        </div>
                     </div>
                 </div>
             </div>

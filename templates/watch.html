@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}{{title}}{% endblock %}
+
+{% block main %}
+<div class="container" style="align-content: center;">
+<h1 style="margin-bottom: 20px;">{%if title == "Watchlist" %}Your Watchlist {%elif title == "Watched" %}Watch History{% endif%}</h1>
+<div class="movie-grid">
+    {% if len > 0 %}
+    {% for movie in movies %}
+    <a class="movie-popular" href="/movie/{{movie.id}}">
+        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" alt="{{ movie.original_title }}">
+        <div class="movie-popular-title">{{ movie.original_title }}</div>
+    </a>
+    {% endfor %}
+    {% endif %}
+</div>
+</div>
+{% endblock %}
