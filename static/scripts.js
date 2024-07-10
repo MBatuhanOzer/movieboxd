@@ -63,23 +63,56 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById("movie-synopsis").textContent = data.overview;
         document.getElementById("movie-tagline").textContent = data.tagline;
         document.getElementsByTagName("title")[0].innerHTML = `${data.original_title || "Untitled"} (${data.release_date.split('-')[0]})`;
+        document.getElementById("imdb-link").href = `https://www.imdb.com/title/${data.imdb_id}`;
+        if (data.backdrop_path){
+            const movieContainer = document.getElementById("movie-container");
+            movieContainer.style.backgroundImage = `url('https://image.tmdb.org/t/p/w1280${data.backdrop_path}')`;
+            movieContainer.style.backgroundSize = 'cover';
+            movieContainer.style.backgroundPosition = 'center';
+        }
+        
+        for (let i = 0; i < data.videos.results.length; i++) {
+            if (data.videos.results[i].type === 'Trailer' && data.videos.results[i].site === 'YouTube') {
+                const trailerContainer = document.getElementById("trailer-container");
+                const iframe = document.createElement("iframe");
+                iframe.src = `https://www.youtube.com/embed/${data.videos.results[i].key}`;
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                trailerContainer.appendChild(iframe);
+                break;
+            }
+        }
 
-        const creditsContainer = document.getElementById("credits-container");
-        data.credits.forEach(credit => {
-            const p = document.createElement("p");
-            p.textContent = `${credit.role} - ${credit.name}`;
-            creditsContainer.appendChild(p);
+        document.getElementById("watchlist-button").addEventListener("click", async () => {
+            const response = await fetch(`/change/${movieId}/watchlist`);
+            const status = await response.text();
+            if (status === 'Added to watchlist'){
+                document.getElementById("watchlist-button").textContent = "✓";
+                document.getElementById("watchlist-button").title = "Added to Watchlist";
+            }
+            else if (status === 'Deleted'){
+                document.getElementById("watchlist-button").textContent = "+";
+                document.getElementById("watchlist-button").title = "Add to Watchlist";
+            }
         });
 
-        // Add event listeners for interactive buttons
-        document.getElementById("watchlist-button").addEventListener("click", () => {
-            // Add to watchlist logic
-            alert("Added to watchlist!");
-        });
-
-        document.getElementById("watched-button").addEventListener("click", () => {
-            // Mark as watched logic
-            alert("Marked as watched!");
+        document.getElementById("watched-button").addEventListener("click", async () => {
+            const response = await fetch(`/change/${movieId}/watched`);
+            const status = await response.text();
+            if (status === 'Added to watched'){
+                document.getElementById("watched-button").textContent = "Watched"
+                document.getElementById("watched-button").title = "Watched";
+            }
+            else if (status === 'Deleted'){
+                document.getElementById("watched-button").textContent = "Mark Watched"
+                document.getElementById("watched-button").title = "Mark Watched";
+            }
+            else if (status === 'Watched from watchlist'){
+                document.getElementById("watched-button").textContent = "Watched"
+                document.getElementById("watched-button").title = "Watched";
+                document.getElementById("watchlist-button").textContent = "+";
+                document.getElementById("watchlist-button").title = "Add to Watchlist";
+            }
         });
     } catch (error) {
         console.error('Error fetching movie data:', error);
