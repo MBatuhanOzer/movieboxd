@@ -39,7 +39,7 @@ def login():
             if not request.form.get("password"):
                 flash("Enter your password")
                 return redirect("/login")
-            rows =cursor.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
+            rows = cursor.execute("SELECT * FROM users WHERE username = ?", (request.form.get("username"),)).fetchall()
             rad = [dict(row) for row in rows]
             if len(rad) != 1:
                 flash("Invalid username")
@@ -133,7 +133,21 @@ def search():
 @app.route("/movie/<int:movieid>")
 @login_required
 def movie(movieid):
-    return render_template("movie.html")
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    rows = cursor.execute("SELECT * FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
+    rad = [dict(row) for row in rows]
+    if len(rad) == 1:
+        match rad[0]["status"]:
+            case "watched and watchlist":
+                return render_template("movie.html", watched=True, watchlist=True)
+            case "watched":
+                return render_template("movie.html", watched=True, watchlist=False)
+            case "watchlist":
+                return render_template("movie.html", watched=False, watchlist=True)
+    else:
+        return render_template("movie.html", watched=False, watchlist=False)
 
 @app.route("/api", methods=["GET"])
 @login_required
@@ -145,3 +159,48 @@ def api():
         'api_key': API
     })
     return jsonify(response.json())
+
+@app.route("/change/<int:movieid>/<string:button>")
+@login_required
+def change(movieid, button):
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    rows = cursor.execute("SELECT * FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
+    rad = [dict(row) for row in rows]
+    if len(rad) == 1:
+        if button == "watched":
+            if rad[0]["status"] == "watched":
+                cursor.execute("DELETE FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
+                conn.commit()
+                return "Deleted"
+            if rad[0]["status"] == "watchlist":
+                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watched",session["user_id"],movieid))
+                conn.commit()
+                return "Watched from watchlist"
+            if rad[0]["status"] == "watched and watchlist":
+                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watchlist",session["user_id"],movieid))
+                conn.commit()
+                return "Deleted"
+        if button == "watchlist":
+            if rad[0]["status"] == "watched":
+                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watched and watchlist",session["user_id"],movieid))
+                conn.commit()
+                return "Added to watchlist"
+            if rad[0]["status"] == "watchlist":
+                cursor.execute("DELETE FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
+                conn.commit()
+                return "Deleted"
+            if rad[0]["status"] == "watched and watchlist":
+                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watched",session["user_id"],movieid))
+                conn.commit()
+                return "Deleted"
+    else:
+        if button == "watched":
+            cursor.execute("INSERT INTO movies (status, user_id, movie_id) VALUES (?, ?, ?)", ("watched",session["user_id"],movieid))
+            conn.commit()
+            return "Added to watched"
+        if button == "watchlist":
+            cursor.execute("INSERT INTO movies (status, user_id, movie_id) VALUES (?, ?, ?)", ("watchlist",session["user_id"],movieid))
+            conn.commit()
+            return "Added to watchlist"
