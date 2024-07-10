@@ -4,8 +4,16 @@
 {% block main %}
         <div id="movie-container" class="movie-container">
             <div class="top-right-icons">
-                <button id="watchlist-button" title="Add to Watchlist">★</button>
-                <button id="watched-button" title="Mark Watched">✓</button>
+                {% if watched %}
+                <button id="watched-button" title="Watched">Watched</button>
+                {% else %}
+                <button id="watched-button" title="Mark Watched">Mark Watched</button>
+                {% endif %}
+                {% if watchlist %}
+                <button id="watchlist-button" title="Added to Watchlist">✓</button>
+                {% else %}
+                <button id="watchlist-button" title="Add to Watchlist">+</button>
+                {% endif %}
             </div>
             <div class="movie-poster">
                 <img id="movie-poster" src="" alt="Movie Poster">
@@ -17,12 +25,19 @@
                     <div id="movie-score" class="score"></div>
                     <p>TMDB Rating</p>
                 </div>  
+                <div>
+                    <a id="imdb-link" href="" target="_blank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/IMDB_Logo_2016.svg" alt="IMDb" id="imdb-logo">
+                    </a>
+                </div>
                 <div class="synopsis">
                     <div id="movie-tagline" class="movie-tagline"></div>
                     <h2>Overview</h2>
                     <p id="movie-synopsis"></p>
                 </div>
-                <div class="credits" id="credits-container"></div>
+                <div class="credits" id="credits-container"></div>   
             </div>
         </div>
+        <div style="margin-left: 10%;"><h1>Trailer</h1></div>
+        <div class="trailer-container" id="trailer-container"></div>
 {% endblock %}
