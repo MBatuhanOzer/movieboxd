@@ -1,3 +1,5 @@
+import datetime
+import pytz
 import sqlite3
 import requests
 from flask import Flask, redirect, render_template, request, session, flash, jsonify
@@ -80,6 +82,11 @@ def register():
             try:
                 name = request.form.get("username")
                 passhash = generate_password_hash(request.form.get("password"))
+                rows = cursor.execute("SELECT * FROM users WHERE username = ?", (name,)).fetchall()
+                rad = [dict(row) for row in rows]
+                if len(rad) != 0:
+                    flash("User already exists")
+                    return redirect("/login")
                 cursor.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (name, passhash,))
                 conn.commit()
                 userid = cursor.execute("SELECT id FROM users WHERE username = ?", (name,)).fetchall()
@@ -112,7 +119,7 @@ def index():
     })
     if response.status_code == 200:
         return render_template("index.html", movies=response.json().get("results", []))
-    return []
+    return render_template("index.html")
 
 
 @app.route('/search', methods=['GET'])
@@ -136,18 +143,21 @@ def movie(movieid):
     conn = sqlite3.connect("data.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    rows = cursor.execute("SELECT * FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
-    rad = [dict(row) for row in rows]
-    if len(rad) == 1:
-        match rad[0]["status"]:
-            case "watched and watchlist":
-                return render_template("movie.html", watched=True, watchlist=True)
-            case "watched":
-                return render_template("movie.html", watched=True, watchlist=False)
-            case "watchlist":
-                return render_template("movie.html", watched=False, watchlist=True)
+    rowswl = cursor.execute("SELECT * FROM watchlist WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid)).fetchall()
+    watch_list = [dict(row) for row in rowswl]
+    rowswd = cursor.execute("SELECT * FROM watched WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid)).fetchall()
+    watch_ed = [dict(row) for row in rowswd]
+    if len(watch_ed) == 1:
+        watched = True
+    else: 
+        watched = False
+    if len(watch_list) == 1:
+        watchlist = True
     else:
-        return render_template("movie.html", watched=False, watchlist=False)
+        watchlist = False
+    return render_template("movie.html", watched=watched, watchlist=watchlist)
+    
+
 
 @app.route("/api", methods=["GET"])
 @login_required
@@ -166,41 +176,82 @@ def change(movieid, button):
     conn = sqlite3.connect("data.db")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    rows = cursor.execute("SELECT * FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
-    rad = [dict(row) for row in rows]
-    if len(rad) == 1:
-        if button == "watched":
-            if rad[0]["status"] == "watched":
-                cursor.execute("DELETE FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
-                conn.commit()
-                return "Deleted"
-            if rad[0]["status"] == "watchlist":
-                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watched",session["user_id"],movieid))
+    rowswl = cursor.execute("SELECT * FROM watchlist WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid)).fetchall()
+    watch_list = [dict(row) for row in rowswl]
+    rowswd = cursor.execute("SELECT * FROM watched WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid)).fetchall()
+    watch_ed = [dict(row) for row in rowswd]
+    t = datetime.datetime.now(pytz.timezone("Turkey")).strftime('%Y-%m-%d %H:%M:%S')
+    if button == "watched":
+        if len(watch_ed) == 1:
+            cursor.execute("DELETE FROM watched WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
+            conn.commit()
+            return "Deleted"
+        elif len(watch_ed) == 0:
+            cursor.execute("INSERT INTO watched (user_id, movie_id, time) VALUES (?, ?, ?)", (session["user_id"], movieid, t))
+            conn.commit()
+            if len(watch_list) == 1:
+                cursor.execute("DELETE FROM watchlist WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
                 conn.commit()
                 return "Watched from watchlist"
-            if rad[0]["status"] == "watched and watchlist":
-                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watchlist",session["user_id"],movieid))
-                conn.commit()
-                return "Deleted"
-        if button == "watchlist":
-            if rad[0]["status"] == "watched":
-                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watched and watchlist",session["user_id"],movieid))
-                conn.commit()
-                return "Added to watchlist"
-            if rad[0]["status"] == "watchlist":
-                cursor.execute("DELETE FROM movies WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
-                conn.commit()
-                return "Deleted"
-            if rad[0]["status"] == "watched and watchlist":
-                cursor.execute("UPDATE movies SET status = ? WHERE user_id = ? AND movie_id = ?", ("watched",session["user_id"],movieid))
-                conn.commit()
-                return "Deleted"
-    else:
-        if button == "watched":
-            cursor.execute("INSERT INTO movies (status, user_id, movie_id) VALUES (?, ?, ?)", ("watched",session["user_id"],movieid))
+            return "Added to watched"        
+    elif button == "watchlist":
+        if len(watch_list) == 1:
+            cursor.execute("DELETE FROM watchlist WHERE user_id = ? AND movie_id = ?", (session["user_id"],movieid))
             conn.commit()
-            return "Added to watched"
-        if button == "watchlist":
-            cursor.execute("INSERT INTO movies (status, user_id, movie_id) VALUES (?, ?, ?)", ("watchlist",session["user_id"],movieid))
+            return "Deleted"
+        elif len(watch_list) == 0:
+            cursor.execute("INSERT INTO watchlist (user_id, movie_id, time) VALUES (?, ?, ?)",(session["user_id"], movieid, t))
             conn.commit()
             return "Added to watchlist"
+
+
+@app.route("/watchlist", methods=["GET"])
+@login_required
+def watchlist():
+    global API
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    rows = cursor.execute("SELECT * FROM watchlist WHERE user_id = ? ORDER BY time DESC", (session["user_id"],)).fetchall()
+    rad = [dict(row) for row in rows]
+    movies = []
+    for movie in rad:
+        query = movie["movie_id"]
+        response = requests.get(f'https://api.themoviedb.org/3/movie/{query}',params={
+        'api_key': API
+    })
+        if response.status_code == 200:
+            movie_data = response.json()
+            movies.append(movie_data)
+        else:
+            print(f"Error fetching data for movie ID {movie['movie_id']}: {response.status_code}")
+    length = len(movies)
+    return render_template("watch.html", movies=movies, title="Watchlist", len=length)
+
+
+@app.route("/watched", methods=["GET"])
+@login_required
+def watched():
+    global API
+    conn = sqlite3.connect("data.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    rows = cursor.execute("SELECT * FROM watched WHERE user_id = ? ORDER BY time DESC", (session["user_id"],)).fetchall()
+    rad = [dict(row) for row in rows]
+    movies = []
+    for movie in rad:
+        query = movie["movie_id"]
+        response = requests.get(f'https://api.themoviedb.org/3/movie/{query}',params={
+        'api_key': API
+    })
+        if response.status_code == 200:
+            movie_data = response.json()
+            movies.append(movie_data)
+        else:
+            print(f"Error fetching data for movie ID {movie['movie_id']}: {response.status_code}")
+    length = len(movies)
+    return render_template("watch.html", movies=movies, title="Watched", len=length)
+
+
+
+
