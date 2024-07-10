@@ -131,24 +131,31 @@ a {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
+    justify-content: flex-start; /* Start movies from the beginning of the row */
 }
+
 .movie-popular {
-    flex: 1 1 calc(20% - 20px);
+    flex: 1 1 calc(20% - 20px); /* Adjust the percentage width for up to 5 movies per row */
+    max-width: calc(20% - 20px); /* Ensure the max width is consistent */
     box-sizing: border-box;
     background-color: #1e1e1e;
     padding: 10px;
     border-radius: 8px;
+    margin-bottom: 20px; /* Adjust bottom margin to control spacing between rows */
 }
+
 .movie-popular img {
     width: 100%;
     border-radius: 8px;
 }
+
 .movie-popular-title {
     margin-top: 10px;
     font-size: 16px;
     color: #fff;
     text-align: center;
 }
+
 
 .movie-container {
     display: flex;
@@ -243,6 +250,7 @@ a {
     font-size: 24px;
     cursor: pointer;
     margin-left: 10px;
+    margin-right: 10px;
 }
 
 .movie-tagline {
